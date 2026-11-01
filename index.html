@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101b3d">
+<title>مار تویی پله منم 🎲</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&display=swap');
+:root{--navy:#101b3d;--blue:#233d78;--gold:#ffd166;--cream:#fff8e8;--pink:#ff6488;--cyan:#51d6df}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Vazirmatn,Tahoma,sans-serif;color:#fff;background:radial-gradient(circle at 15% 10%,#314f91 0,#172751 35%,#0c1430 80%);padding:22px}
+.app{max-width:1100px;margin:auto}
+header{text-align:center;margin-bottom:20px}
+h1{font-size:clamp(28px,5vw,48px);margin:0;color:var(--gold);text-shadow:0 4px 0 #9a5d20,0 8px 22px #0008;letter-spacing:-1px}
+.subtitle{color:#dce6ff;margin:8px 0 0}
+.layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:20px;align-items:start}
+.panel{background:linear-gradient(145deg,#243b70,#14234b);border:1px solid #ffffff25;border-radius:24px;padding:18px;box-shadow:0 18px 35px #0005,inset 0 1px #ffffff20}
+.board-wrap{position:relative;padding:9px;background:linear-gradient(145deg,#fce7ad,#d99a42);border-radius:20px;box-shadow:0 9px 0 #89521f,0 18px 28px #0006}
+.board{display:grid;grid-template-columns:repeat(10,1fr);aspect-ratio:1/1;overflow:hidden;border-radius:12px;position:relative;background:#fff}
+.cell{position:relative;display:flex;align-items:flex-start;justify-content:flex-start;padding:4px;font-size:clamp(8px,1.5vw,14px);font-weight:800;color:#25345a;border:1px solid #263b641c;min-width:0;min-height:0}
+.cell:nth-child(odd){background:#fff4d9}.cell:nth-child(even){background:#c8f0e8}
+.cell.special{background:#ffe49a}
+.cell .num{z-index:1}
+.tokens{position:absolute;inset:0;pointer-events:none;z-index:3}
+.token{position:absolute;width:clamp(15px,3.1vw,29px);height:clamp(15px,3.1vw,29px);border-radius:50%;border:3px solid #fff;box-shadow:0 3px 5px #0008;transform:translate(-50%,-50%);transition:left .35s,top .35s;display:grid;place-items:center;font-size:clamp(8px,1.2vw,12px);font-weight:900;color:#fff}
+.token.p1{background:linear-gradient(145deg,#ff9bb0,#d91f54)}.token.p2{background:linear-gradient(145deg,#8beaff,#1479d5)}
+.token span{filter:drop-shadow(0 1px 1px #0008)}
+.board-svg{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.side{display:flex;flex-direction:column;gap:14px}
+.turn{border-radius:16px;padding:14px;background:#0d1838aa;border:1px solid #ffffff22}
+.turn strong{font-size:19px;color:var(--gold)}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.player{padding:12px;border-radius:15px;background:#ffffff12;border:2px solid transparent}
+.player.active{border-color:var(--gold);background:#ffd16618;box-shadow:0 0 0 3px #ffd16620}
+.player b{display:block;margin-bottom:5px}.player small{color:#d8e3ff}
+.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dice{width:70px;height:70px;border-radius:17px;background:linear-gradient(145deg,#fff,#dce6f5);color:#1c2c52;display:grid;place-items:center;font-size:43px;box-shadow:0 6px 0 #9eacc3,0 10px 18px #0005;user-select:none}
+.dice.rolling{animation:shake .45s ease}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(14deg) scale(1.08)}50%{transform:rotate(-14deg) scale(1.08)}75%{transform:rotate(8deg)}}
+button{font:inherit;border:0;border-radius:14px;padding:12px 18px;font-weight:800;cursor:pointer;transition:transform .15s,filter .15s}
+button:hover{filter:brightness(1.08);transform:translateY(-2px)}button:active{transform:translateY(1px)}
+.primary{background:linear-gradient(145deg,#ffe28b,#ffb938);color:#38240a;box-shadow:0 5px 0 #a86a18}
+.secondary{background:#ffffff18;color:#fff;border:1px solid #ffffff35}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.message{min-height:54px;line-height:1.8;color:#e7edff;background:#0d1838aa;border-radius:14px;padding:12px;font-size:14px}
+.rules{font-size:13px;line-height:2;color:#dce6ff;margin:0;padding-right:18px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;color:#dce6ff;font-size:12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:5px}
+footer{text-align:center;color:#aebfe8;font-size:12px;margin-top:22px}
+.win{color:#ffe18a;font-weight:900}
+@media(max-width:760px){body{padding:12px}.layout{grid-template-columns:1fr}.panel{padding:12px}.side{display:grid;grid-template-columns:1fr 1fr}.side .turn,.side .message,.side .rulesbox{grid-column:1/-1}.board-wrap{padding:6px}.cell{padding:2px}}
+@media(max-width:390px){.side{grid-template-columns:1fr}.side>*{grid-column:1/-1}.dice{width:60px;height:60px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>🐍 مار تویی پله منم 🪜</h1><p class="subtitle">تاس بنداز، از پله‌ها بالا برو و حواست به مارها باشه!</p></header>
+<div class="layout">
+<section class="panel">
+ <div class="board-wrap">
+  <div class="board" id="board"></div>
+  <svg class="board-svg" id="art" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+  <div class="tokens" id="tokens"><div class="token p1" id="token1"><span>۱</span></div><div class="token p2" id="token2"><span>۲</span></div></div>
+ </div>
+ <div class="legend" style="margin-top:15px"><span><i class="dot" style="background:#ff6488"></i>طیبه</span><span><i class="dot" style="background:#51bfff"></i>بازیکن ۲</span><span>🪜 پله</span><span>🐍 مار</span></div>
+</section>
+<aside class="side">
+ <div class="turn"><div>نوبت بازی</div><strong id="turnText">طیبه</strong></div>
+ <div class="players">
+  <div class="player active" id="player1"><b>🔴 طیبه</b><small>خانه: <span id="pos1">۰</span></small></div>
+  <div class="player" id="player2"><b>🔵 بازیکن ۲</b><small>خانه: <span id="pos2">۰</span></small></div>
+ </div>
+ <div class="turn">
+  <div class="controls"><div class="dice" id="dice">⚀</div><button class="primary" id="roll">🎲 انداختن تاس</button></div>
+  <p style="font-size:12px;color:#dce6ff;margin:13px 0 0">برای شروع، تاس را لمس کن.</p>
+ </div>
+ <div class="message" id="message" aria-live="polite">بازی آماده است! طیبه شروع می‌کند.</div>
+ <div class="turn rulesbox"><b style="color:var(--gold)">📜 قوانین بازی</b><ul class="rules"><li>هر بازیکن با رسیدن به خانه ۱۰۰ برنده می‌شود.</li><li>اگر روی پایین پله بایستی، بالا می‌روی.</li><li>اگر روی سر مار بایستی، پایین می‌آیی.</li><li>برای رسیدن به ۱۰۰ باید عدد تاس دقیق باشد.</li></ul></div>
+ <button class="secondary" id="restart">↻ شروع دوباره</button>
+</aside>
+</div>
+<footer>ساخته‌شده برای بازی دونفره • قابل اجرا روی موبایل و کامپیوتر</footer>
+</div>
+<script>
+const ladders={3:22,8:30,20:41,28:55,36:57,51:72,71:92,80:99};
+const snakes={17:7,27:1,34:12,47:26,62:19,59:43,87:24,95:75,99:78};
+const board=document.getElementById('board'), art=document.getElementById('art');
+const positions=[0,0];const playerNames=['طیبه','بازیکن ۲'];let current=0,locked=false,finished=false;
+const faces=['⚀','⚁','⚂','⚃','⚄','⚅'];
+function coords(n){
+ if(n===0)return{x:5,y:95};
+ const row=Math.floor((n-1)/10),col=(n-1)%10;
+ const actualCol=row%2===0?col:9-col;
+ return{x:actualCol*10+5,y:95-row*10};
+}
+function makeBoard(){
+ board.innerHTML='';
+ for(let row=9;row>=0;row--){
+  for(let col=0;col<10;col++){
+   const n=row%2===0?row*10+col+1:row*10+(10-col);
+   const el=document.createElement('div');el.className='cell'+((ladders[n]||snakes[n])?' special':'');
+   el.innerHTML='<span class="num">'+n+'</span>';
+   if(ladders[n])el.title='پله به '+ladders[n];
+   if(snakes[n])el.title='مار تا '+snakes[n];
+   board.appendChild(el);
+  }
+ }
+ drawArt();updateTokens();
+}
+function drawArt(){
+ let s='';
+ for(const [a,b] of Object.entries(ladders)){
+  const p=coords(+a),q=coords(b),dx=q.x-p.x,dy=q.y-p.y,len=Math.hypot(dx,dy),ox=-dy/len*1.15,oy=dx/len*1.15;
+  s+=`<line x1="${p.x+ox}%" y1="${p.y+oy}%" x2="${q.x+ox}%" y2="${q.y+oy}%" stroke="#8b4c16" stroke-width="1.5" stroke-linecap="round"/><line x1="${p.x-ox}%" y1="${p.y-oy}%" x2="${q.x-ox}%" y2="${q.y-oy}%" stroke="#8b4c16" stroke-width="1.5" stroke-linecap="round"/>`;
+  for(let t=.15;t<.95;t+=.16){const x=p.x+dx*t,y=p.y+dy*t;s+=`<line x1="${x-ox}%" y1="${y-oy}%" x2="${x+ox}%" y2="${y+oy}%" stroke="#b96b24" stroke-width="1.1"/>`;}
+ }
+ for(const [a,b] of Object.entries(snakes)){
+  const p=coords(+a),q=coords(b),mx=(p.x+q.x)/2+((+a%2)?5:-5),my=(p.y+q.y)/2;
+  s+=`<path d="M ${p.x*10} ${p.y*10} Q ${mx*10} ${my*10} ${q.x*10} ${q.y*10}" fill="none" stroke="#159b78" stroke-width="19" stroke-linecap="round" opacity=".92"/><circle cx="${p.x*10}" cy="${p.y*10}" r="13" fill="#20bd91" stroke="#075e4a" stroke-width="5"/><circle cx="${p.x*10-4}" cy="${p.y*10-3}" r="2.5" fill="white"/><circle cx="${p.x*10+4}" cy="${p.y*10-3}" r="2.5" fill="white"/>`;
+ }
+ art.innerHTML=s;
+}
+function updateTokens(){
+ positions.forEach((pos,i)=>{const c=coords(pos),el=document.getElementById('token'+(i+1));el.style.left=c.x+'%';el.style.top=c.y+'%';el.style.marginLeft=(i===0?'-9px':'9px');});
+ document.getElementById('pos1').textContent=positions[0];document.getElementById('pos2').textContent=positions[1];
+}
+function setTurnUI(){
+ document.getElementById('turnText').textContent=playerNames[current];
+ document.getElementById('player1').classList.toggle('active',current===0);
+ document.getElementById('player2').classList.toggle('active',current===1);
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function roll(){
+ if(locked||finished)return;locked=true;document.getElementById('roll').disabled=true;
+ const dice=document.getElementById('dice');dice.classList.add('rolling');
+ let value=1;for(let i=0;i<9;i++){value=1+Math.floor(Math.random()*6);dice.textContent=faces[value-1];await sleep(55);}
+ dice.classList.remove('rolling');
+ const old=positions[current],next=old+value;
+ if(next>100){document.getElementById('message').textContent=`عدد ${value} آمد؛ برای رسیدن به ۱۰۰ باید عدد دقیق بیاید. نوبت بعدی!`;}
+ else{
+  positions[current]=next;updateTokens();
+  let msg=`${playerNames[current]} عدد ${value} آورد و به خانه ${next} رسید.`;
+  await sleep(350);
+  if(ladders[next]){positions[current]=ladders[next];updateTokens();msg+=` 🪜 چه شانسی! از پله بالا رفتی و به خانه ${positions[current]} رسیدی!`;}
+  else if(snakes[next]){positions[current]=snakes[next];updateTokens();msg+=` 🐍 اوه نه! مار تو را به خانه ${positions[current]} برد!`;}
+  document.getElementById('message').textContent=msg;
+  if(positions[current]===100){finished=true;document.getElementById('turnText').innerHTML=`<span class="win">🏆 ${playerNames[current]} برنده شد!</span>`;document.getElementById('message').innerHTML=`<span class="win">تبریک! ${playerNames[current]} قهرمان بازی شد! 🎉</span>`;document.getElementById('roll').disabled=true;locked=false;return;}
+ }
+ current=1-current;setTurnUI();locked=false;document.getElementById('roll').disabled=false;
+}
+function restart(){positions[0]=0;positions[1]=0;current=0;locked=false;finished=false;document.getElementById('dice').textContent='⚀';document.getElementById('message').textContent='بازی از نو شروع شد! طیبه تاس بینداز.';document.getElementById('roll').disabled=false;setTurnUI();updateTokens();}
+document.getElementById('roll').addEventListener('click',roll);
+document.getElementById('restart').addEventListener('click',restart);
+makeBoard();
+</script>
+
+<style>
+.site-credit{max-width:1100px;margin:26px auto 4px;padding:16px 12px;text-align:center;color:#dce6ff;font-size:14px;line-height:2;border-top:1px solid #ffffff26}
+.site-credit strong{display:block;color:#ffd166;font-size:15px;font-weight:800}
+.site-credit span{display:block;color:#c7d5f5}
+</style>
+<footer class="site-credit" aria-label="اطلاعات سازنده بازی">
+  <strong>ساخته‌شده برای بازی دونفره • قابل اجرا روی موبایل و کامپیوتر</strong>
+  <span>طراحی و توسعه: طیبه رسول خانی</span>
+</footer>
+</body>
+</html>
